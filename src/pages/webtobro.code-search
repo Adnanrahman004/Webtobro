@@ -1,0 +1,29 @@
+# Query: webtobro
+# ContextLines: 1
+
+6 results - 2 files
+
+frontend\src\components\Navbar.jsx:
+  28            <span className="text-xl md:text-2xl font-black tracking-tight text-white drop-shadow-sm">
+  29:             Webtobro<span className="text-[#a78bfa]">.</span>
+  30            </span>
+
+frontend\src\pages\Home.jsx:
+  212      );
+  213:     window.location.href = `mailto:info@webtobro.dev?subject=${subject}&body=${body}`;
+  214    };
+
+  595                  <a
+  596:                   href="mailto:info@webtobro.dev"
+  597                    className="inline-block text-lg lg:text-xl font-bold text-[#0B0C10] border-b-2 border-[#0B0C10] pb-1 hover:text-[#8b5cf6] hover:border-[#8b5cf6] transition-colors"
+  598                  >
+  599:                   info@webtobro.dev
+  600                  </a>
+
+  678              <h2 className="text-5xl sm:text-7xl lg:text-[8rem] leading-none font-black text-[#8b5cf6] tracking-tighter mb-6 lg:mb-8 uppercase">
+  679:               Webtobro
+  680              </h2>
+
+  690            <div className="flex flex-col sm:flex-row justify-between items-center w-full border-t border-gray-300 pt-6 text-[11px] sm:text-xs lg:text-sm font-bold uppercase tracking-widest text-gray-500 gap-4">
+  691:             <p>© {new Date().getFullYear()} Webtobro</p>
+  692              <div className="flex gap-4 items-center">
