@@ -25,7 +25,7 @@ export default function Navbar() {
             </svg>
           </div>
           <span className="text-xl md:text-2xl font-black tracking-tight text-white drop-shadow-sm">
-            Webtobrof<span className="text-[#a78bfa]">.</span>
+            Webtobro<span className="text-[#a78bfa]">.</span>
           </span>
         </Link>
       </div>

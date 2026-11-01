@@ -6,13 +6,25 @@ import React, { useEffect, useRef, useState } from "react";
 /* ================================================================== */
 const BRAND = "Webtobro";
 const EMAIL = "info@webtobro.dev";
-// Country code ke saath, bina + ya space ke. Example: "919876543210"
-// Khali chhodoge to WhatsApp button hide rahega.
-const WHATSAPP_NUMBER = "";
+const CURRENT_YEAR = new Date().getFullYear();
+// Country code ke saath, bina + ya space ke (91 = India)
+const WHATSAPP_NUMBER = "919060331685";
+// true = brand navbar me hamesha dikhega, false = sirf scroll karne par
+const SHOW_BRAND_AT_TOP = false;
+const DEMO_MESSAGE =
+  "Hi! I’d like to request a demo of your website/app services.";
+const WHATSAPP_MESSAGE =
+  "Hi! I’d like to talk about a website/app for my business.";
 const SOCIAL = {
   linkedin: "#", // apna LinkedIn link daalo
   instagram: "#", // apna Instagram link daalo
 };
+
+/* WhatsApp chat link (number khali ho to khali string) */
+const waLink = (text) =>
+  WHATSAPP_NUMBER
+    ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`
+    : "";
 
 /* ================================================================== */
 /*  Small reusable pieces                                              */
@@ -21,15 +33,14 @@ const SOCIAL = {
 /* Scroll reveal: element screen me aate hi smooth animate hota hai */
 function Reveal({ children, className = "", delay = 0, from = "up" }) {
   const ref = useRef(null);
-  const [shown, setShown] = useState(false);
+  const [shown, setShown] = useState(
+    () => typeof IntersectionObserver === "undefined",
+  );
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
-    if (typeof IntersectionObserver === "undefined") {
-      setShown(true);
-      return undefined;
-    }
+    if (typeof IntersectionObserver === "undefined") return undefined;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -76,14 +87,17 @@ function Container({ children, className = "" }) {
   );
 }
 
-/* Smooth open/close (height animation bina max-height hack ke) */
+/* Smooth open/close. Band hone par andar ke links keyboard se focus nahi hote (inert) */
 function Collapse({ open, children, className = "" }) {
+  const inertProps = open ? {} : { inert: "" };
   return (
     <div
       className={`grid transition-[grid-template-rows] duration-500 ease-in-out motion-reduce:transition-none ${className}`}
       style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
     >
-      <div className="overflow-hidden">{children}</div>
+      <div className="overflow-hidden min-h-0" {...inertProps}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -297,6 +311,84 @@ const PROJECTS = [
     description: "A website for a local chai shop.",
     tags: ["Next.js", "React", "Firebase"],
   },
+  /* Neeche ke 3 cards sample hain. Apne real projects ke naam, description,
+     tags, image ("/xyz.jpg" public folder me) aur url se badal do. */
+  {
+    name: "Glow Salon Booking",
+    industry: "Salons & clinics",
+    emoji: "💇",
+    bg: "bg-[#ec4899]",
+    description:
+      "Appointment booking with reminders and customer records for a salon.",
+    tags: ["React", "Node.js", "Firebase"],
+  },
+  {
+    name: "QuickBill POS",
+    industry: "Restaurants & retail",
+    emoji: "🧾",
+    bg: "bg-[#0f766e]",
+    description: "Fast billing and daily sales reports for cafés and shops.",
+    tags: ["Next.js", "Express.js", "Database"],
+  },
+  {
+    name: "EduTrack",
+    industry: "Coaching & schools",
+    emoji: "🎓",
+    bg: "bg-[#2563eb]",
+    description: "Attendance and fee tracking for coaching centres.",
+    tags: ["React", "Node.js", "Firebase"],
+  },
+];
+
+const MANIFESTO_POINTS = [
+  {
+    title: "No account managers",
+    desc: "You talk straight to the people who build your product.",
+  },
+  {
+    title: "No handoffs to strangers",
+    desc: "The team that starts your project is the team that finishes it.",
+  },
+  {
+    title: "Senior people",
+    desc: "People who care how it feels at 2 a.m. on launch night.",
+  },
+];
+
+const LOCAL_AREAS = [
+  "Bistupur",
+  "Sakchi",
+  "Kadma",
+  "Telco",
+  "Adityapur",
+  "Sonari",
+  "Golmuri",
+  "Mango",
+  "Jugsalai",
+  "Baridih",
+];
+
+const LOCAL_POINTS = [
+  {
+    emoji: "💸",
+    title: "Pocket-friendly plans",
+    desc: "Clear, honest pricing made for local shops and small businesses. No hidden extras.",
+  },
+  {
+    emoji: "📍",
+    title: "Your own city team",
+    desc: "We’re based in Jamshedpur, so we understand how local business really works.",
+  },
+  {
+    emoji: "💬",
+    title: "Easy to reach",
+    desc: "Message us on WhatsApp and talk in Hindi or English. No call centres, no waiting.",
+  },
+  {
+    emoji: "🛠️",
+    title: "Support after launch",
+    desc: "We stay with you after launch and keep fixing, improving and adding features.",
+  },
 ];
 
 const PROCESS = [
@@ -325,19 +417,19 @@ const PROCESS = [
 const FOUNDERS = [
   {
     no: "01",
-    initials: "NR",
+    initials: "AR",
     name: "Adnan Rahman",
     role: "Co-founder • Frontend & mobile apps",
-    bio: "Designs and builds everything you see and touch: fast websites and smooth Android & iOS apps. If it scrolls, swipes or sparkles, it went through Nimesh.",
+    bio: "Designs and builds fast, polished websites and mobile apps, with a focus on the details people notice as they scroll, swipe and interact.",
     email: "rahmanadnan0551@gmail.com",
   },
   {
     no: "02",
-    initials: "AJ",
+    initials: "SZ",
     name: "SM ZAID",
     role: "Co-founder • Backend & mobile apps",
-    bio: "The engine room: servers, databases and the logic behind every app, plus mobile builds end to end. Aditya makes sure it all holds up when the traffic spikes.",
-    email: "",
+    bio: "Builds the systems behind the product—servers, databases and reliable app logic—so everything keeps working as the business grows.",
+    email: "", // email ho to yahan daalo, khali rahe to link hide rahega
   },
 ];
 
@@ -1009,7 +1101,7 @@ function Earth({ className = "" }) {
 
   return (
     <div
-      className={`relative rounded-full shadow-[0_0_50px_8px_rgba(96,165,250,0.35)] ${className}`}
+      className={`relative rounded-full shadow-[0_18px_50px_-8px_rgba(37,99,235,0.4)] ${className}`}
     >
       <canvas
         ref={canvasRef}
@@ -1029,48 +1121,50 @@ function ProjectCard({ p }) {
 
   const content = (
     <div
-      className={`${p.bg} text-white rounded-2xl p-4 sm:p-5 flex flex-col gap-3 relative overflow-hidden transition-transform duration-300 hover:-translate-y-1`}
+      className={`${p.bg} text-white rounded-2xl p-4 flex flex-col gap-3 w-full flex-1 transition-transform duration-300 hover:-translate-y-1`}
     >
-      <div className="flex justify-between items-start gap-3">
-        <span className="text-xs sm:text-sm font-medium text-white/80">
+      <div className="flex justify-between items-center gap-2 min-h-[24px]">
+        <span className="text-[11px] sm:text-xs font-medium text-white/80 truncate">
           {p.industry}
         </span>
-        <div className="flex items-center gap-2">
-          {p.badge && (
-            <span className="flex items-center gap-1.5 bg-white/20 text-white text-[10px] sm:text-xs font-bold uppercase px-2.5 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              {p.badge}
-            </span>
-          )}
-          <span className="text-xl lg:text-2xl">{p.emoji}</span>
-        </div>
+        {p.badge && (
+          <span className="flex items-center gap-1.5 bg-white/20 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            {p.badge}
+          </span>
+        )}
       </div>
 
-      {imgOk && (
-        <img
-          src={p.image}
-          alt={`${p.name} screenshot`}
-          loading="lazy"
-          onError={() => setImgOk(false)}
-          className="w-full h-auto block rounded-xl border border-white/20"
-        />
-      )}
-
-      <div>
-        <h3 className="text-lg sm:text-xl lg:text-2xl font-extrabold uppercase tracking-tight leading-tight">
-          {p.name}
-          {p.url && <span className="ml-2 text-white/70">↗</span>}
-        </h3>
-        {p.description && (
-          <p className="text-xs sm:text-sm text-white/85 mt-1.5 max-w-md leading-relaxed">
-            {p.description}
-          </p>
+      {/* Sab cards me image box same size, image na ho to emoji dikhta hai */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl border border-white/20 bg-black/10 flex items-center justify-center">
+        {imgOk ? (
+          <img
+            src={p.image}
+            alt={`${p.name} screenshot`}
+            loading="lazy"
+            onError={() => setImgOk(false)}
+            className="absolute inset-0 w-full h-full object-cover object-top"
+          />
+        ) : (
+          <span className="text-5xl" aria-hidden="true">
+            {p.emoji}
+          </span>
         )}
-        <div className="flex gap-1.5 mt-3 flex-wrap">
-          {p.tags.map((tag) => (
+      </div>
+
+      <div className="flex flex-col flex-1">
+        <h3 className="text-base font-extrabold uppercase tracking-tight leading-tight line-clamp-2 min-h-[2.5rem]">
+          {p.name}
+          {p.url && <span className="ml-1.5 text-white/70">↗</span>}
+        </h3>
+        <p className="text-xs text-white/85 mt-1 leading-relaxed line-clamp-2 min-h-[2.5rem]">
+          {p.description}
+        </p>
+        <div className="flex gap-1.5 mt-auto pt-3 flex-wrap">
+          {p.tags.slice(0, 3).map((tag) => (
             <span
               key={tag}
-              className="border border-white/40 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] uppercase tracking-wider"
+              className="border border-white/40 px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider"
             >
               {tag}
             </span>
@@ -1086,12 +1180,225 @@ function ProjectCard({ p }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`Open ${p.name}`}
-      className="block rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8b5cf6]"
+      className="flex w-full rounded-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8b5cf6]"
     >
       {content}
     </a>
   ) : (
     content
+  );
+}
+
+/* ================================================================== */
+/*  NEW FEATURE: Project Planner                                       */
+/*  Visitor chips chunta hai, brief ban jata hai, WhatsApp/email pe    */
+/*  ek click me aapke paas aa jata hai                                 */
+/* ================================================================== */
+const PLANNER_TYPES = [
+  "Restaurant or café",
+  "Shop or retail",
+  "Salon or clinic",
+  "Manufacturer",
+  "Coaching or school",
+  "Delivery or services",
+  "Startup",
+  "Other",
+];
+const PLANNER_NEEDS = [
+  "Website",
+  "Android app",
+  "iOS app",
+  "Billing & POS",
+  "Online ordering",
+  "Booking system",
+  "CRM",
+  "Dashboard",
+  "WhatsApp automation",
+  "Inventory",
+];
+const PLANNER_TIMES = ["As soon as possible", "Within a month", "Flexible"];
+
+function Chip({ active, onClick, children }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`px-3.5 py-1.5 rounded-full border text-xs sm:text-sm font-medium transition active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a78bfa] ${
+        active
+          ? "bg-[#8b5cf6] border-[#8b5cf6] text-white"
+          : "border-white/25 text-white/80 hover:border-[#a78bfa] hover:text-white"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function ProjectPlanner() {
+  const [type, setType] = useState("");
+  const [needs, setNeeds] = useState([]);
+  const [time, setTime] = useState("");
+
+  const toggleNeed = (n) =>
+    setNeeds((cur) =>
+      cur.includes(n) ? cur.filter((x) => x !== n) : [...cur, n],
+    );
+
+  const ready = Boolean(type) || needs.length > 0;
+  const brief = [
+    "Hi! I’d like to plan a project with you.",
+    `Business: ${type || "-"}`,
+    `What I need: ${needs.length ? needs.join(", ") : "-"}`,
+    `Timeline: ${time || "-"}`,
+  ].join("\n");
+
+  const waHref = waLink(brief);
+  const mailHref = `mailto:${EMAIL}?subject=${encodeURIComponent("Project brief")}&body=${encodeURIComponent(brief)}`;
+  const reset = () => {
+    setType("");
+    setNeeds([]);
+    setTime("");
+  };
+
+  const btnBase =
+    "w-full text-center font-semibold text-sm px-6 py-3 rounded-full transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a78bfa]";
+
+  return (
+    <section
+      id="planner"
+      className="scroll-mt-16 bg-[#0B0C10] text-white py-14 sm:py-16 lg:py-20 relative overflow-hidden"
+    >
+      <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
+      <Container className="relative z-10">
+        <Reveal>
+          <h2 className="font-extrabold uppercase tracking-tight leading-[1.05] text-2xl sm:text-3xl lg:text-5xl mb-2 lg:mb-3">
+            Plan your project
+            <br />
+            <span className="text-[#a78bfa]">in 30 seconds.</span>
+          </h2>
+          <p className="text-sm sm:text-base lg:text-lg text-gray-400 mb-8 lg:mb-10 max-w-xl">
+            Pick what fits. We turn it into a ready brief you can send us in one
+            tap, no long forms.
+          </p>
+        </Reveal>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6 lg:gap-8 items-start">
+          <Reveal from="left">
+            <div className="flex flex-col gap-6">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+                  1. Your business
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {PLANNER_TYPES.map((t) => (
+                    <Chip
+                      key={t}
+                      active={type === t}
+                      onClick={() => setType(type === t ? "" : t)}
+                    >
+                      {t}
+                    </Chip>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+                  2. What do you need? (pick many)
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {PLANNER_NEEDS.map((n) => (
+                    <Chip
+                      key={n}
+                      active={needs.includes(n)}
+                      onClick={() => toggleNeed(n)}
+                    >
+                      {n}
+                    </Chip>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+                  3. When do you want it?
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {PLANNER_TIMES.map((t) => (
+                    <Chip
+                      key={t}
+                      active={time === t}
+                      onClick={() => setTime(time === t ? "" : t)}
+                    >
+                      {t}
+                    </Chip>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal from="right" delay={120}>
+            <div className="rounded-2xl lg:rounded-3xl bg-white/5 border border-white/15 p-5 lg:p-6">
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
+                Your brief
+              </p>
+              <dl className="text-sm space-y-2 mb-5">
+                <div className="flex gap-2">
+                  <dt className="text-gray-400 w-20 flex-shrink-0">Business</dt>
+                  <dd className="font-semibold">{type || "-"}</dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="text-gray-400 w-20 flex-shrink-0">Need</dt>
+                  <dd className="font-semibold">
+                    {needs.length ? needs.join(", ") : "-"}
+                  </dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="text-gray-400 w-20 flex-shrink-0">Timeline</dt>
+                  <dd className="font-semibold">{time || "-"}</dd>
+                </div>
+              </dl>
+
+              <div className="flex flex-col gap-2.5">
+                {waHref && (
+                  <a
+                    href={ready ? waHref : undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-disabled={!ready}
+                    className={`${btnBase} flex items-center justify-center gap-2 bg-[#25D366] text-white ${ready ? "hover:bg-[#1fb757] hover:scale-[1.02] active:scale-95" : "opacity-40 cursor-not-allowed"}`}
+                  >
+                    <WhatsAppIcon className="w-5 h-5" />
+                    Send on WhatsApp
+                  </a>
+                )}
+                <a
+                  href={ready ? mailHref : undefined}
+                  aria-disabled={!ready}
+                  className={`${btnBase} border border-white/30 text-white ${ready ? "hover:bg-white/10 active:scale-95" : "opacity-40 cursor-not-allowed"}`}
+                >
+                  Send by email
+                </a>
+                {ready && (
+                  <button
+                    type="button"
+                    onClick={reset}
+                    className="text-xs text-gray-400 hover:text-white underline underline-offset-4 mt-1"
+                  >
+                    Clear and start again
+                  </button>
+                )}
+              </div>
+              {!ready && (
+                <p className="text-xs text-gray-500 mt-3">
+                  Pick at least one option to enable the buttons.
+                </p>
+              )}
+            </div>
+          </Reveal>
+        </div>
+      </Container>
+    </section>
   );
 }
 
@@ -1107,6 +1414,7 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [showTop, setShowTop] = useState(false);
   const [wordIdx, setWordIdx] = useState(0);
+  const [active, setActive] = useState("");
   const barRef = useRef(null);
 
   /* Scroll progress bar + navbar state + back-to-top (ek hi listener, rAF se smooth) */
@@ -1120,6 +1428,12 @@ export default function Home() {
       }
       setScrolled(y > 24);
       setShowTop(y > 700);
+      let cur = "";
+      NAV.forEach((n) => {
+        const el = document.getElementById(n.href.slice(1));
+        if (el && el.getBoundingClientRect().top <= 140) cur = n.href;
+      });
+      setActive(cur);
       ticking = false;
     };
     const onScroll = () => {
@@ -1148,13 +1462,14 @@ export default function Home() {
 
   /* Mobile menu khula ho to page scroll lock + Esc se band */
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    const previousOverflow = document.body.style.overflow;
+    if (menuOpen) document.body.style.overflow = "hidden";
     const onKey = (e) => {
       if (e.key === "Escape") setMenuOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey);
     };
   }, [menuOpen]);
@@ -1172,9 +1487,12 @@ export default function Home() {
     window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
   };
 
-  const whatsappHref = WHATSAPP_NUMBER
-    ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I’d like to talk about a website/app for my business.")}`
-    : "";
+  /* Click karte hi seedha is number ke WhatsApp chat me khulega */
+  const whatsappHref = waLink(WHATSAPP_MESSAGE);
+  const demoHref = waLink(DEMO_MESSAGE);
+
+  const showBrand = SHOW_BRAND_AT_TOP || scrolled || menuOpen;
+  const startPrice = PLANS[0].price;
 
   const sectionPad = "py-14 sm:py-16 lg:py-20";
   const h2Base =
@@ -1183,6 +1501,7 @@ export default function Home() {
     "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8b5cf6]";
   const inputCls =
     "w-full bg-transparent border-b-2 border-[#0B0C10] py-2 text-base focus:outline-none focus:border-[#8b5cf6] placeholder-gray-400 transition-colors";
+  const socialBtn = `w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:text-white hover:-translate-y-0.5 active:scale-95 transition ${focusRing}`;
 
   return (
     <div className="w-full bg-[#f4f4f6] overflow-x-hidden font-sans antialiased">
@@ -1223,27 +1542,53 @@ export default function Home() {
       <header
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
           scrolled || menuOpen
-            ? "bg-[#0B0C10]/90 backdrop-blur-md shadow-lg shadow-black/10"
-            : "bg-transparent"
+            ? "bg-[#0B0C10]/85 backdrop-blur-xl shadow-lg shadow-black/20 border-b border-white/10"
+            : "bg-transparent border-b border-transparent"
         }`}
       >
-        <Container className="flex items-center justify-end h-14 lg:h-16">
+        <Container className="flex items-center justify-between h-14 lg:h-16">
+          {/* Brand: scroll karne par (ya menu khulne par) dikhta hai */}
+          <a
+            href="#top"
+            aria-label={`${BRAND} home`}
+            tabIndex={showBrand ? 0 : -1}
+            className={`flex items-center gap-2 rounded-lg transition-all duration-300 ${focusRing} ${
+              showBrand
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-2 pointer-events-none"
+            }`}
+          >
+            <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#8b5cf6] to-[#ec4899] text-white flex items-center justify-center text-base font-black shadow-md shadow-purple-500/30">
+              {BRAND.charAt(0)}
+            </span>
+            <span className="text-white text-lg font-extrabold tracking-tight">
+              {BRAND}
+            </span>
+          </a>
+
           <nav
             className="hidden md:flex items-center gap-6 lg:gap-8"
             aria-label="Main"
           >
-            {NAV.map((n) => (
-              <a
-                key={n.href}
-                href={n.href}
-                className={`text-sm font-medium text-white/70 hover:text-white transition-colors rounded ${focusRing}`}
-              >
-                {n.label}
-              </a>
-            ))}
+            {NAV.map((n) => {
+              const isActive = active === n.href;
+              return (
+                <a
+                  key={n.href}
+                  href={n.href}
+                  aria-current={isActive ? "true" : undefined}
+                  className={`group relative text-sm font-medium transition-colors rounded ${focusRing} ${isActive ? "text-white" : "text-white/70 hover:text-white"}`}
+                >
+                  {n.label}
+                  <span
+                    className={`absolute -bottom-1 left-0 h-0.5 rounded bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
+                  />
+                </a>
+              );
+            })}
             <a
               href="#contact"
-              className={`bg-white text-black text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#a78bfa] hover:scale-[1.04] active:scale-95 transition ${focusRing}`}
+              className={`bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white text-sm font-semibold px-4 py-2 rounded-full shadow-md shadow-purple-500/30 hover:brightness-110 hover:scale-[1.04] active:scale-95 transition ${focusRing}`}
             >
               Book a call
             </a>
@@ -1254,7 +1599,7 @@ export default function Home() {
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((o) => !o)}
-            className={`md:hidden relative w-10 h-10 flex items-center justify-center rounded-full ${focusRing}`}
+            className={`md:hidden relative w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 ${focusRing}`}
           >
             <span
               className={`absolute h-0.5 w-5 bg-white rounded transition-transform duration-300 ${menuOpen ? "rotate-45" : "-translate-y-1.5"}`}
@@ -1272,23 +1617,29 @@ export default function Home() {
         <div className="md:hidden">
           <Collapse open={menuOpen}>
             <nav
-              className="px-5 pb-6 pt-2 flex flex-col gap-1"
+              className="max-h-[calc(100vh-3.5rem)] overflow-y-auto overscroll-contain px-5 pb-6 pt-2 flex flex-col gap-1"
               aria-label="Mobile"
             >
-              {NAV.map((n) => (
-                <a
-                  key={n.href}
-                  href={n.href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`text-white/90 text-lg font-semibold py-2.5 border-b border-white/10 ${focusRing}`}
-                >
-                  {n.label}
-                </a>
-              ))}
+              {NAV.map((n) => {
+                const isActive = active === n.href;
+                return (
+                  <a
+                    key={n.href}
+                    href={n.href}
+                    onClick={() => setMenuOpen(false)}
+                    className={`text-lg font-semibold py-2.5 border-b border-white/10 flex items-center justify-between ${focusRing} ${isActive ? "text-[#c4b5fd]" : "text-white/90"}`}
+                  >
+                    {n.label}
+                    <span aria-hidden="true" className="text-white/30">
+                      →
+                    </span>
+                  </a>
+                );
+              })}
               <a
                 href="#contact"
                 onClick={() => setMenuOpen(false)}
-                className={`mt-4 text-center bg-white text-black font-semibold text-sm px-6 py-3 rounded-full active:scale-95 transition ${focusRing}`}
+                className={`mt-4 text-center bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white font-semibold text-sm px-6 py-3 rounded-full shadow-lg shadow-purple-500/30 active:scale-95 transition ${focusRing}`}
               >
                 Book a discovery call
               </a>
@@ -1300,38 +1651,44 @@ export default function Home() {
       {/* ================= HERO ================= */}
       <section
         id="top"
-        className="bg-[#0B0C10] text-white relative w-full min-h-[100svh] flex items-center justify-center overflow-hidden px-5 sm:px-8 pt-24 pb-20 lg:py-24"
+        className="bg-[#0B0C10] text-white relative w-full flex items-start justify-center overflow-hidden px-5 sm:px-8 pt-16 pb-16 sm:pt-16 sm:pb-20 lg:pt-[4.5rem] lg:pb-24"
       >
         <div className="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
-        <div className="glow-anim absolute top-1/2 left-1/2 w-[260px] h-[260px] sm:w-[380px] sm:h-[380px] lg:w-[520px] lg:h-[520px] bg-purple-900/40 blur-[100px] rounded-full z-0" />
+        <div className="absolute inset-x-0 top-0 h-72 z-0 bg-gradient-to-b from-[#8b5cf6]/20 to-transparent" />
+        <div className="glow-anim absolute top-[42%] left-1/2 w-[260px] h-[260px] sm:w-[380px] sm:h-[380px] lg:w-[520px] lg:h-[520px] bg-purple-900/40 blur-[100px] rounded-full z-0" />
         <div className="floaty absolute top-[18%] left-[8%] w-3 h-3 rounded-full bg-[#a78bfa]/60 blur-[1px] z-0" />
         <div className="floaty-slow absolute bottom-[22%] right-[10%] w-4 h-4 rounded-full bg-pink-500/50 blur-[1px] z-0" />
         <div className="floaty absolute top-[30%] right-[16%] w-2 h-2 rounded-full bg-white/40 z-0" />
 
         <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center text-center">
+          {/* Premium badge: gradient border + glass inside */}
           <Reveal>
-            <span className="inline-flex items-center gap-2 border border-white/20 bg-white/5 text-xs sm:text-sm text-gray-200 px-3.5 py-1.5 rounded-full mb-5 sm:mb-6">
-              <span className="relative flex w-2 h-2">
-                <span className="ping2 absolute inline-flex w-full h-full rounded-full bg-green-400" />
-                <span className="relative inline-flex w-2 h-2 rounded-full bg-green-400" />
-              </span>
-              Software for local{" "}
-              <span
-                key={ROTATING[wordIdx]}
-                className="word-in inline-block font-semibold text-[#a78bfa]"
-              >
-                {ROTATING[wordIdx]}
+            <span className="inline-flex rounded-full p-px bg-gradient-to-r from-[#8b5cf6]/80 via-white/20 to-[#ec4899]/80 shadow-lg shadow-purple-500/20 mb-5 sm:mb-6">
+              <span className="inline-flex items-center gap-2.5 rounded-full bg-[#0B0C10]/90 backdrop-blur px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-200">
+                <span className="relative flex w-2 h-2 flex-shrink-0">
+                  <span className="ping2 absolute inline-flex w-full h-full rounded-full bg-green-400" />
+                  <span className="relative inline-flex w-2 h-2 rounded-full bg-green-400" />
+                </span>
+                <span className="whitespace-nowrap">Software for local</span>
+                <span
+                  key={ROTATING[wordIdx]}
+                  className="word-in inline-block min-w-[7.5rem] sm:min-w-[9rem] text-left font-semibold bg-gradient-to-r from-[#c4b5fd] to-[#f472b6] bg-clip-text text-transparent"
+                >
+                  {ROTATING[wordIdx]}
+                </span>
               </span>
             </span>
           </Reveal>
+
           <Reveal delay={100}>
-            <h1 className="text-[2rem] leading-[1.1] sm:text-5xl lg:text-6xl font-extrabold tracking-tight uppercase">
+            <h1 className="text-[2rem] leading-[1.1] sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight uppercase">
               You bring the <br className="hidden sm:block" /> Spark <br />
-              <span className="text-[#a78bfa]">
+              <span className="bg-gradient-to-r from-[#a78bfa] via-[#c4b5fd] to-[#f472b6] bg-clip-text text-transparent">
                 We bring the <br className="hidden sm:block" /> Stack
               </span>
             </h1>
           </Reveal>
+
           <Reveal delay={200}>
             <p className="mt-5 sm:mt-6 text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed max-w-md sm:max-w-xl mx-auto">
               We build modern websites and powerful Android & iOS apps for local
@@ -1339,28 +1696,50 @@ export default function Home() {
               beautiful, fast and easy-to-use digital product.
             </p>
           </Reveal>
+
           <Reveal delay={300} className="w-full">
             <div className="mt-7 sm:mt-9 flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
               <a
                 href="#contact"
-                className={`w-full max-w-[280px] sm:w-auto sm:max-w-none text-center bg-white text-black font-semibold text-sm px-6 py-2.5 rounded-full hover:bg-gray-200 hover:scale-[1.03] active:scale-95 transition ${focusRing}`}
+                className={`w-full max-w-[280px] sm:w-auto sm:max-w-none text-center bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] text-white font-semibold text-sm px-6 py-2.5 rounded-full shadow-lg shadow-purple-500/40 hover:brightness-110 hover:scale-[1.03] active:scale-95 transition ${focusRing}`}
               >
                 Book a discovery call →
               </a>
               <a
                 href="#projects"
-                className={`w-full max-w-[280px] sm:w-auto sm:max-w-none text-center bg-transparent border border-white/30 text-white font-semibold text-sm px-6 py-2.5 rounded-full hover:bg-white/10 hover:scale-[1.03] active:scale-95 transition ${focusRing}`}
+                className={`w-full max-w-[280px] sm:w-auto sm:max-w-none text-center bg-white/5 backdrop-blur border border-white/30 text-white font-semibold text-sm px-6 py-2.5 rounded-full hover:bg-white/10 hover:scale-[1.03] active:scale-95 transition ${focusRing}`}
               >
                 See what we shipped
               </a>
             </div>
+          </Reveal>
+
+          {/* Trust row (text aapki site ke hi points se) */}
+          <Reveal delay={400}>
+            <ul className="mt-7 sm:mt-9 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] sm:text-xs text-gray-400">
+              {[
+                "Free discovery call",
+                "Weekly progress drops",
+                "You own your product",
+              ].map((t) => (
+                <li key={t} className="flex items-center gap-1.5">
+                  <span
+                    aria-hidden="true"
+                    className="flex w-4 h-4 items-center justify-center rounded-full bg-[#8b5cf6]/25 text-[#c4b5fd] text-[10px]"
+                  >
+                    ✓
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
           </Reveal>
         </div>
 
         <a
           href="#about"
           aria-label="Scroll down"
-          className="hidden sm:block absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-white/50 hover:text-white transition text-xl"
+          className="hidden sm:block absolute bottom-5 left-1/2 -translate-x-1/2 z-10 text-white/50 hover:text-white transition text-xl"
         >
           <span className="nudge-anim block">↓</span>
         </a>
@@ -1391,24 +1770,50 @@ export default function Home() {
       >
         <Container className="max-w-3xl">
           <Reveal>
-            <p className="text-xs sm:text-sm font-bold tracking-widest text-gray-500 uppercase mb-4 sm:mb-5">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-3.5 py-1.5 text-xs sm:text-sm font-bold tracking-widest text-[#6d3fe0] uppercase mb-5 sm:mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#8b5cf6]" />
               Manifesto
-            </p>
+            </span>
           </Reveal>
           <Reveal delay={100}>
-            <h2 className="text-lg sm:text-xl lg:text-3xl font-medium leading-[1.5] lg:leading-[1.4]">
-              We’re a small tribe of builders who got tired of software that
-              looks great in a pitch deck and falls apart on a Monday morning.
-              So we build the other kind. The kind that survives real users,
-              real traffic and real deadlines. No account managers. No handing
-              you off to strangers. Just senior people who care how your product
-              feels at 2 a.m. on launch night.
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-[1.2] text-[#0B0C10]">
+              We’re a small tribe of builders who got tired of software that{" "}
+              <span className="bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] bg-clip-text text-transparent">
+                looks great in a pitch deck
+              </span>{" "}
+              and{" "}
+              <span className="bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] bg-clip-text text-transparent">
+                falls apart on a Monday morning.
+              </span>
             </h2>
           </Reveal>
+          <Reveal delay={200}>
+            <p className="mt-5 lg:mt-6 pl-4 sm:pl-5 border-l-4 border-[#8b5cf6] text-base sm:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-2xl">
+              So we build the other kind. The kind that survives real users,
+              real traffic and real deadlines.
+            </p>
+          </Reveal>
+          <div className="mt-8 lg:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
+            {MANIFESTO_POINTS.map((pt, i) => (
+              <Reveal key={pt.title} delay={300 + i * 100}>
+                <div className="h-full rounded-2xl bg-white border border-gray-200 p-4 lg:p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#8b5cf6] hover:shadow-lg hover:shadow-purple-500/10">
+                  <span className="mb-3 flex w-8 h-8 items-center justify-center rounded-full bg-gradient-to-br from-[#8b5cf6] to-[#ec4899] text-white text-sm font-bold">
+                    ✓
+                  </span>
+                  <h3 className="text-sm lg:text-base font-extrabold uppercase tracking-tight mb-1">
+                    {pt.title}
+                  </h3>
+                  <p className="text-xs lg:text-sm text-gray-600 leading-relaxed">
+                    {pt.desc}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
           <Reveal from="zoom" delay={150} className="mt-10 lg:mt-14">
-            <div className="relative overflow-hidden rounded-3xl bg-[#04060f] py-8 sm:py-10 flex justify-center">
-              <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:34px_34px]" />
-              <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#a78bfa_1px,transparent_1px)] [background-size:53px_53px] [background-position:17px_23px]" />
+            <div className="relative overflow-hidden rounded-3xl bg-[#fbfaf6] border border-gray-200 shadow-sm py-8 sm:py-10 flex justify-center">
+              <div className="absolute inset-0 opacity-70 bg-[radial-gradient(#d4d4d8_1px,transparent_1px)] [background-size:34px_34px]" />
+              <div className="absolute inset-0 opacity-30 bg-[radial-gradient(#a78bfa_1px,transparent_1px)] [background-size:53px_53px] [background-position:17px_23px]" />
               <Earth className="relative w-44 h-44 sm:w-56 sm:h-56 lg:w-64 lg:h-64" />
             </div>
           </Reveal>
@@ -1566,9 +1971,13 @@ export default function Home() {
             </p>
           </Reveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5 items-start">
+          <div className="flex flex-wrap justify-center gap-4 lg:gap-5">
             {PROJECTS.map((p, i) => (
-              <Reveal key={p.name} delay={i * 150}>
+              <Reveal
+                key={p.name}
+                delay={(i % 3) * 120}
+                className="flex w-full sm:w-[calc((100%_-_1rem)/2)] lg:w-[calc((100%_-_2.5rem)/3)]"
+              >
                 <ProjectCard p={p} />
               </Reveal>
             ))}
@@ -1649,12 +2058,14 @@ export default function Home() {
                     <p className="text-sm sm:text-base text-gray-600 mb-4 leading-relaxed">
                       {f.bio}
                     </p>
-                    <a
-                      href={`mailto:${f.email}`}
-                      className={`inline-block text-sm font-bold border-b-2 border-[#0B0C10] pb-0.5 break-all hover:text-[#8b5cf6] hover:border-[#8b5cf6] transition-colors ${focusRing}`}
-                    >
-                      {f.email}
-                    </a>
+                    {f.email && (
+                      <a
+                        href={`mailto:${f.email}`}
+                        className={`inline-block text-sm font-bold border-b-2 border-[#0B0C10] pb-0.5 break-all hover:text-[#8b5cf6] hover:border-[#8b5cf6] transition-colors ${focusRing}`}
+                      >
+                        {f.email}
+                      </a>
+                    )}
                   </div>
                 </div>
               </Reveal>
@@ -1776,6 +2187,9 @@ export default function Home() {
         </Container>
       </section>
 
+      {/* ================= PROJECT PLANNER (new) ================= */}
+      <ProjectPlanner />
+
       {/* ================= CONTACT ================= */}
       <section
         id="contact"
@@ -1803,14 +2217,19 @@ export default function Home() {
                 >
                   {EMAIL}
                 </a>
+
+                {/* WhatsApp button: click par seedha WhatsApp chat khulta hai */}
                 {whatsappHref && (
                   <a
                     href={whatsappHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`mt-5 flex w-fit items-center gap-2 bg-[#25D366] text-white font-semibold text-sm px-5 py-2.5 rounded-full hover:scale-[1.03] active:scale-95 transition ${focusRing}`}
+                    aria-label="Chat on WhatsApp"
+                    className={`mt-6 flex w-fit items-center gap-3 bg-[#25D366] text-white font-semibold text-sm sm:text-base pl-3 pr-6 py-2.5 rounded-full shadow-lg shadow-green-500/25 hover:bg-[#1fb757] hover:scale-[1.03] active:scale-95 transition ${focusRing}`}
                   >
-                    <WhatsAppIcon className="w-5 h-5" />
+                    <span className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+                      <WhatsAppIcon className="w-6 h-6" />
+                    </span>
                     Chat on WhatsApp
                   </a>
                 )}
@@ -1924,6 +2343,148 @@ export default function Home() {
         </Container>
       </section>
 
+      {/* ================= JAMSHEDPUR LOCAL (new) ================= */}
+      <section
+        id="jamshedpur"
+        className={`scroll-mt-16 bg-white text-[#0B0C10] ${sectionPad} border-t border-gray-200`}
+      >
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-[1.25fr_1fr] gap-8 lg:gap-12 items-center">
+            <Reveal from="left">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#8b5cf6]/30 bg-[#8b5cf6]/10 px-3.5 py-1.5 text-xs sm:text-sm font-bold text-[#6d3fe0] mb-4 sm:mb-5">
+                <span aria-hidden="true">📍</span> Jamshedpur, Jharkhand
+              </span>
+              <h2 className={h2Base}>
+                Jamshedpur’s own
+                <br />
+                <span className="bg-gradient-to-r from-[#8b5cf6] to-[#ec4899] bg-clip-text text-transparent">
+                  affordable software team
+                </span>
+              </h2>
+              <p className="mt-4 text-sm sm:text-base lg:text-lg text-gray-600 max-w-xl leading-relaxed">
+                Big-city quality without big-city bills. We build websites, apps
+                and business software for shops, clinics, factories and startups
+                right here in our city.
+              </p>
+              <p className="mt-6 mb-2.5 text-xs font-bold uppercase tracking-widest text-gray-500">
+                Local businesses we love working with
+              </p>
+              <ul className="flex flex-wrap gap-2">
+                {LOCAL_AREAS.map((area) => (
+                  <li
+                    key={area}
+                    className="rounded-full border border-gray-300 bg-[#f4f4f6] px-3 py-1 text-xs sm:text-sm font-medium text-gray-700"
+                  >
+                    {area}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+
+            <Reveal from="right" delay={120}>
+              <div className="relative overflow-hidden rounded-3xl bg-[#0B0C10] text-white p-6 lg:p-8">
+                <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-[#8b5cf6]/30 blur-[70px]" />
+                <div className="absolute -bottom-20 -left-10 w-56 h-56 rounded-full bg-[#ec4899]/20 blur-[70px]" />
+                <div className="relative">
+                  <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                    Websites starting at
+                  </p>
+                  <p className="mt-1 text-5xl lg:text-6xl font-black tracking-tight bg-gradient-to-r from-[#c4b5fd] to-[#f472b6] bg-clip-text text-transparent">
+                    {startPrice}
+                  </p>
+                  <ul className="mt-5 space-y-2 text-sm text-gray-300">
+                    {PLANS[0].items.slice(0, 4).map((it) => (
+                      <li key={it} className="flex items-center gap-2">
+                        <span
+                          aria-hidden="true"
+                          className="flex w-4 h-4 flex-shrink-0 items-center justify-center rounded-full bg-[#8b5cf6]/30 text-[#c4b5fd] text-[10px]"
+                        >
+                          ✓
+                        </span>
+                        {it}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-6 flex flex-col sm:flex-row gap-2.5">
+                    <a
+                      href="#pricing"
+                      className={`text-center bg-white text-black font-semibold text-sm px-5 py-2.5 rounded-full hover:bg-gray-200 hover:scale-[1.03] active:scale-95 transition ${focusRing}`}
+                    >
+                      See all plans →
+                    </a>
+                    {whatsappHref && (
+                      <a
+                        href={whatsappHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold text-sm px-5 py-2.5 rounded-full hover:bg-[#1fb757] hover:scale-[1.03] active:scale-95 transition ${focusRing}`}
+                      >
+                        <WhatsAppIcon className="w-4 h-4" />
+                        Ask on WhatsApp
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+
+          <div className="mt-10 lg:mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+            {LOCAL_POINTS.map((pt, i) => (
+              <Reveal key={pt.title} delay={i * 90} from="zoom">
+                <div className="group h-full rounded-2xl bg-[#f4f4f6] border border-gray-200 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#8b5cf6] hover:shadow-lg hover:shadow-purple-500/10">
+                  <div className="text-3xl mb-3 inline-block transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+                    {pt.emoji}
+                  </div>
+                  <h3 className="text-sm lg:text-base font-extrabold uppercase tracking-tight mb-1.5">
+                    {pt.title}
+                  </h3>
+                  <p className="text-xs lg:text-sm text-gray-600 leading-relaxed">
+                    {pt.desc}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ================= REQUEST FOR DEMO (last CTA) ================= */}
+      <section
+        aria-label="Request a demo"
+        className="bg-[#f4f4f6] px-5 sm:px-8 lg:px-10 pb-12 lg:pb-16"
+      >
+        <div className="max-w-5xl mx-auto">
+          <Reveal from="zoom">
+            <div className="relative overflow-hidden rounded-3xl bg-[#0B0C10] text-white px-6 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-14 flex flex-col lg:flex-row items-center justify-between gap-7 lg:gap-10 text-center lg:text-left">
+              <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
+              <div className="absolute -top-24 -left-16 w-72 h-72 rounded-full bg-[#8b5cf6]/30 blur-[90px]" />
+              <div className="absolute -bottom-24 -right-16 w-72 h-72 rounded-full bg-[#ec4899]/25 blur-[90px]" />
+              <div className="relative max-w-xl">
+                <h2 className="font-extrabold uppercase tracking-tight leading-[1.05] text-2xl sm:text-3xl lg:text-4xl">
+                  See it in action.
+                </h2>
+                <p className="mt-3 text-sm sm:text-base text-gray-300 leading-relaxed">
+                  Request a quick demo and we’ll show you how a website or app
+                  can work for your business.
+                </p>
+              </div>
+              <a
+                href={demoHref || `mailto:${EMAIL}?subject=Request%20a%20demo`}
+                target={demoHref ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className={`relative flex-shrink-0 inline-flex items-center justify-center gap-2.5 bg-[#25D366] text-white font-semibold text-sm sm:text-base pl-4 pr-7 py-3.5 rounded-full shadow-lg shadow-green-500/30 hover:bg-[#1fb757] hover:scale-[1.04] active:scale-95 transition ${focusRing}`}
+              >
+                <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                  <WhatsAppIcon className="w-5 h-5" />
+                </span>
+                Request for demo
+              </a>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ================= FOOTER ================= */}
       <footer className="bg-[#f4f4f6] text-[#0B0C10] pt-12 lg:pt-14 pb-8 border-t border-gray-300">
         <Container className="flex flex-col items-center text-center">
@@ -1956,23 +2517,42 @@ export default function Home() {
           </Reveal>
           <div className="flex flex-col sm:flex-row justify-between items-center w-full border-t border-gray-300 pt-6 text-[11px] sm:text-xs font-bold uppercase tracking-widest text-gray-500 gap-4">
             <p>
-              © {new Date().getFullYear()} {BRAND}
+              © {CURRENT_YEAR} {BRAND}
             </p>
             <div className="flex gap-3 items-center">
-              <a
-                href={SOCIAL.linkedin}
-                aria-label="LinkedIn"
-                className={`w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:text-white hover:bg-[#8b5cf6] hover:border-[#8b5cf6] hover:-translate-y-0.5 active:scale-95 transition ${focusRing}`}
-              >
-                <LinkedInIcon className="w-[18px] h-[18px]" />
-              </a>
-              <a
-                href={SOCIAL.instagram}
-                aria-label="Instagram"
-                className={`w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:text-white hover:bg-[#8b5cf6] hover:border-[#8b5cf6] hover:-translate-y-0.5 active:scale-95 transition ${focusRing}`}
-              >
-                <InstagramIcon className="w-[18px] h-[18px]" />
-              </a>
+              {whatsappHref && (
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="WhatsApp"
+                  className={`${socialBtn} hover:bg-[#25D366] hover:border-[#25D366]`}
+                >
+                  <WhatsAppIcon className="w-[18px] h-[18px]" />
+                </a>
+              )}
+              {SOCIAL.linkedin !== "#" && (
+                <a
+                  href={SOCIAL.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  className={`${socialBtn} hover:bg-[#8b5cf6] hover:border-[#8b5cf6]`}
+                >
+                  <LinkedInIcon className="w-[18px] h-[18px]" />
+                </a>
+              )}
+              {SOCIAL.instagram !== "#" && (
+                <a
+                  href={SOCIAL.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className={`${socialBtn} hover:bg-[#8b5cf6] hover:border-[#8b5cf6]`}
+                >
+                  <InstagramIcon className="w-[18px] h-[18px]" />
+                </a>
+              )}
             </div>
           </div>
           <p className="mt-5 text-[11px] lg:text-xs text-gray-400">
